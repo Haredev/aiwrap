@@ -351,23 +351,23 @@ def run_provider(provider: Provider, config: AIWrapConfig,
     if config.verbose or (args and args.verbose):
         print(f"Running: {' '.join(cmd)}")
 
-    # Check if timer is disabled
-    timer_disabled = args and args.no_timer
+    # Check if timer is enabled
+    timer_enabled = args and args.timer
 
     try:
         start_time = time.time()
         result = subprocess.run(cmd, check=False)
         end_time = time.time()
         
-        # Display timing if not disabled
-        if not timer_disabled:
+        # Display timing if enabled
+        if timer_enabled:
             elapsed = end_time - start_time
             print(f"\n⏱  Total time: {format_duration(elapsed)}")
         
         return result.returncode
     except KeyboardInterrupt:
         end_time = time.time()
-        if not timer_disabled:
+        if timer_enabled:
             elapsed = end_time - start_time
             print(f"\n\n⏱  Total time: {format_duration(elapsed)}")
         print("\nInterrupted by user")
@@ -394,9 +394,6 @@ def list_providers(config: AIWrapConfig) -> None:
         
         default_marker = " (default)" if provider == config.default_provider else ""
         print(f"  {provider.value:<10} {status}{default_marker}")
-        
-        if provider_config.model:
-            print(f"             model: {provider_config.model}")
 
 
 def show_config(config: AIWrapConfig, config_path: Optional[Path] = None) -> None:
@@ -414,7 +411,8 @@ def show_config(config: AIWrapConfig, config_path: Optional[Path] = None) -> Non
             print("Config file: (using defaults)")
     
     print(f"Default provider: {config.default_provider.value}")
-    print(f"Verbose mode: {config.verbose}")
+    if config.verbose:
+        print("Verbose mode: enabled")
     print()
     
     list_providers(config)
@@ -565,9 +563,9 @@ Provider Documentation:
     )
 
     parser.add_argument(
-        "--no-timer",
+        "--timer",
         action="store_true",
-        help="Disable timing output"
+        help="Enable timing output"
     )
 
     args = parser.parse_args()

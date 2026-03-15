@@ -1,0 +1,118 @@
+# AIWrap Configuration File
+# This file configures which underlying AI CLI tool to use
+# Place this file in your project root or at ~/.config/aiwrap/aiwrap.toml
+
+[general]
+# The default AI provider to use when running 'aiwrap'
+# Options: "kimi", "gemini", "codex", "claude"
+default_provider = "kimi"
+
+# Enable verbose output for debugging
+verbose = false
+
+# Default working directory (omit or leave empty = current directory)
+# work_dir = "/path/to/project"
+
+# -----------------------------------------------------------------------------
+# Provider: Kimi (Kimi Code CLI)
+# https://moonshotai.github.io/kimi-cli/
+# -----------------------------------------------------------------------------
+[providers.kimi]
+enabled = true
+command = "kimi"
+
+# Default model to use (omit = use CLI default)
+# Available models depend on your Kimi CLI configuration
+# model = "kimi-k2-0711-preview"
+
+# Disable YOLO mode (set to true to prompt for approvals instead of auto-approving)
+yolo_disabled = false
+
+# Enable thinking mode for complex reasoning
+thinking = false
+
+# Additional arguments to pass to kimi CLI
+extra_args = []
+
+# -----------------------------------------------------------------------------
+# Provider: Gemini (Google Gemini CLI)
+# https://github.com/google-gemini/gemini-cli
+# -----------------------------------------------------------------------------
+[providers.gemini]
+enabled = true
+command = "gemini"
+
+# Default model (omit = use CLI default)
+# model = "gemini-2.5-pro"
+
+# Disable YOLO mode (set to true to prompt for approvals instead of auto-approving)
+yolo_disabled = false
+
+# Enable checkpointing for undo support
+checkpointing = true
+
+# Additional arguments to pass to gemini CLI
+extra_args = []
+
+# -----------------------------------------------------------------------------
+# Provider: Codex (OpenAI Codex CLI)
+# https://github.com/openai/codex
+# -----------------------------------------------------------------------------
+[providers.codex]
+enabled = true
+command = "codex"
+
+# Default model (omit = use CLI default)
+# Examples: "gpt-5.3-codex", "gpt-5.2-codex", "o4-mini"
+# model = "gpt-5.3-codex"
+
+# Approval mode: "auto", "suggest", "full-auto"
+# Note: approval_mode is ignored when yolo_disabled = false
+approval_mode = "auto"
+
+# Disable YOLO mode (set to true to prompt for approvals instead of auto-approving)
+yolo_disabled = false
+
+# Additional arguments to pass to codex CLI
+extra_args = []
+
+# -----------------------------------------------------------------------------
+# Provider: Claude (Anthropic Claude Code CLI)
+# https://docs.anthropic.com/en/docs/claude-code/cli
+# -----------------------------------------------------------------------------
+[providers.claude]
+enabled = true
+command = "claude"
+
+# Default model (omit = use CLI default)
+# Examples: "claude-opus-4", "claude-sonnet-4", "claude-haiku-4"
+# model = "claude-sonnet-4"
+
+# Permission mode: "default", "acceptEdits", "bypassPermissions"
+# Note: permission_mode is ignored when yolo_disabled = false
+permission_mode = "default"
+
+# Disable YOLO mode (set to true to prompt for approvals instead of auto-approving)
+yolo_disabled = false
+
+# Additional arguments to pass to claude CLI
+extra_args = []
+
+# -----------------------------------------------------------------------------
+# Key Mappings (for unified slash commands)
+# These map unified commands to provider-specific commands
+# -----------------------------------------------------------------------------
+[mappings]
+# Session management
+quit = { kimi = "/exit", gemini = "/quit", codex = "/exit", claude = "/exit" }
+clear = { kimi = "/clear", gemini = "/clear", codex = "/clear", claude = "/clear" }
+help = { kimi = "/help", gemini = "/help", codex = "/help", claude = "/help" }
+
+# Context management
+compact = { kimi = "/compact", gemini = "/compress", codex = "/compact", claude = "/compact" }
+
+# Model selection
+model = { kimi = "/model", gemini = "/settings", codex = "/model", claude = "/model" }
+
+# Status/Stats
+status = { kimi = "/debug", gemini = "/stats", codex = "/status", claude = "/status" }

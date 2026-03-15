@@ -17,6 +17,7 @@ import os
 import subprocess
 import sys
 import shutil
+import time
 from pathlib import Path
 from typing import Optional, Dict, Any, List
 from dataclasses import dataclass, field
@@ -294,6 +295,29 @@ def build_command(provider: Provider, config: ProviderConfig,
     return builder(config, prompt, args)
 
 
+def format_duration(seconds: float) -> str:
+    """Format duration in human-readable format.
+    
+    Examples:
+        2.34s -> "2.34s"
+        83.45s -> "1m 23s"
+        3661s -> "1h 1m"
+    """
+    if seconds < 60:
+        return f"{seconds:.2f}s"
+    elif seconds < 3600:
+        minutes = int(seconds // 60)
+        secs = seconds % 60
+        if secs >= 1:
+            return f"{minutes}m {int(secs)}s"
+        else:
+            return f"{minutes}m"
+    else:
+        hours = int(seconds // 3600)
+        minutes = int((seconds % 3600) // 60)
+        return f"{hours}h {minutes}m"
+
+
 def run_provider(provider: Provider, config: AIWrapConfig, 
                  prompt: Optional[str] = None,
                  args: argparse.Namespace = None) -> int:
@@ -327,10 +351,25 @@ def run_provider(provider: Provider, config: AIWrapConfig,
     if config.verbose or (args and args.verbose):
         print(f"Running: {' '.join(cmd)}")
 
+    # Check if timer is disabled
+    timer_disabled = args and args.no_timer
+
     try:
+        start_time = time.time()
         result = subprocess.run(cmd, check=False)
+        end_time = time.time()
+        
+        # Display timing if not disabled
+        if not timer_disabled:
+            elapsed = end_time - start_time
+            print(f"\n⏱  Total time: {format_duration(elapsed)}")
+        
         return result.returncode
     except KeyboardInterrupt:
+        end_time = time.time()
+        if not timer_disabled:
+            elapsed = end_time - start_time
+            print(f"\n\n⏱  Total time: {format_duration(elapsed)}")
         print("\nInterrupted by user")
         return 130
     except Exception as e:
@@ -523,6 +562,12 @@ Provider Documentation:
         "--config-file",
         type=Path,
         help="Path to custom configuration file"
+    )
+
+    parser.add_argument(
+        "--no-timer",
+        action="store_true",
+        help="Disable timing output"
     )
 
     args = parser.parse_args()
